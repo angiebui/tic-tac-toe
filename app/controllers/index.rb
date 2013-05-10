@@ -1,5 +1,9 @@
 set :server, 'thin'
 set :sockets, []
+before do
+  @current_player = current_player
+end
+
 
 get '/' do
   if !request.websocket?
@@ -19,4 +23,11 @@ get '/' do
       end
     end
   end
+end
+
+
+post '/signin' do
+  current_player = Player.find_or_create_by_name(params[:name])
+  session[:id] = current_player.id
+  redirect to('/')
 end

@@ -16,8 +16,7 @@ gem 'activerecord'
 gem 'rake'
 
 gem 'shotgun'
-# gem 'em-websocket'
-gem 'sinatra-websocket'
+
 
 group :test do
   gem 'faker'
