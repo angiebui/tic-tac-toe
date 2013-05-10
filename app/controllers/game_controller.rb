@@ -38,7 +38,7 @@ get '/game/:id' do
 end
 
 post '/game/:id/move' do
-  Move.create(player_id: session[:player_id], coord: params[:coord], game_id: params[:id])
+  Move.create(player_id: session[:id], coord: params[:coord], game_id: params[:id])
 end
 
 post '/game/:id/update' do
@@ -54,11 +54,10 @@ end
 
 get '/game/:id/info' do
   content_type :json
-  # player_id = session[:player_id]
-  player_id = 10
-  game_id = params[:id]
-  letter = 'X' #changes based on player number
-  {game_id: game_id, player_id: player_id, letter: letter}.to_json
+  player_id = session[:id]
+  game = Game.find(params[:id])
+  letter = (game.player_one.id == session[:id] ? 'X' : 'O')
+  {game_id: game.id, player_id: player_id, letter: letter}.to_json
 
 
 end
