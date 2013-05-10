@@ -1,22 +1,35 @@
 set :sockets, []
 
 get '/game/:id' do
-  @game = Game.find(params[:id])
 
+  @game = Game.find(params[:id])
+  @player = 10
   if !request.websocket?
     erb :game
   else
     p "websocket detected"
     request.websocket do |ws|
       ws.onopen do
-        ws.send("Hello World!")
+        p "Websocket Opened"
+        # ws.send("{\"playerId\":#{@player}}") #.id 
         settings.sockets << ws
       end
       ws.onmessage do |msg|
-        EM.next_tick { settings.sockets.each{|s| s.send(msg) } }
+        p msg
+        data = JSON.parse(msg)
+        move = Move.create(game_id: data["game_id"], player_id: data["player_id"], coord: data["coord"])
+        game = Game.find(data["game_id"])
+        # winner = game.winner
+        if winner
+          EM.next_tick { settings.sockets.each{|s| s.send(msg) } }
+          #stop the game
+        else
+          EM.next_tick { settings.sockets.each{|s| s.send(msg) } }
+        end
       end
+
       ws.onclose do
-        warn("wetbsocket closed")
+        warn("websocket closed")
         settings.sockets.delete(ws)
       end
     end
@@ -39,6 +52,13 @@ end
 
 
 
-get '/' do
-  
+get '/game/:id/info' do
+  content_type :json
+  # player_id = session[:player_id]
+  player_id = 10
+  game_id = params[:id]
+  letter = 'X' #changes based on player number
+  {game_id: game_id, player_id: player_id, letter: letter}.to_json
+
+
 end
