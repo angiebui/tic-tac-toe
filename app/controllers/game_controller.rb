@@ -1,7 +1,27 @@
+set :sockets, []
+
 get '/game/:id' do
   @game = Game.find(params[:id])
 
-  erb :game
+  if !request.websocket?
+    erb :game
+  else
+    p "websocket detected"
+    request.websocket do |ws|
+      ws.onopen do
+        ws.send("Hello World!")
+        settings.sockets << ws
+      end
+      ws.onmessage do |msg|
+        EM.next_tick { settings.sockets.each{|s| s.send(msg) } }
+      end
+      ws.onclose do
+        warn("wetbsocket closed")
+        settings.sockets.delete(ws)
+      end
+    end
+  end
+
 end
 
 post '/game/:id/move' do
@@ -14,4 +34,11 @@ post '/game/:id/update' do
   move = game.moves.last #the last player to move
 
   {coord: move.coord, previousPlayer: move.player_id}.to_json
+end
+
+
+
+
+get '/' do
+  
 end

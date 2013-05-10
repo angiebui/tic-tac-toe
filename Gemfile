@@ -6,7 +6,7 @@ gem 'pg'
 # Sinatra driver
 gem 'sinatra'
 gem 'sinatra-contrib'
-
+gem 'sinatra-websocket'
 # Use Thin for our web server
 gem 'thin'
 
