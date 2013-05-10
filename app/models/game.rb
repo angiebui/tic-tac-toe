@@ -1,3 +1,5 @@
 class Game < ActiveRecord::Base
-  # Remember to create a migration!
+  has_many :moves
+  belongs_to :player_one, :class_name => "Player", :foreign_key => "player_one"
+  belongs_to :player_two, :class_name => "Player", :foreign_key => "player_two"
 end
