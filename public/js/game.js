@@ -1,4 +1,3 @@
-// Game = {id:1, letter:'X', playerId: 1}; // Player # and Corresponding Letter and Game id
 var socket = new WebSocket("ws://localhost:9292" + window.location.pathname);
 var Game;
 
@@ -12,13 +11,25 @@ var turnOnClick = function(){
     console.log(data)
     socket.send(JSON.stringify(data));
   });
-}
+};
 
+var doWinner = function(data){
+  $('#'+data.coord).html(data.letter);
+  $('.container').append(data.winner_name+' has won!');
+};
 
+var doDraw = function(data){
+  $('.container').append('Draw!');
+};
 
 var parseMessage = function(m){
   var data = JSON.parse(m.data);
-  if(data.playerId != Game.playerId){
+  console.log(data);
+  if(data.winner_id){
+    doWinner(data);
+  } else if (data.draw) {
+    doDraw(data);
+  }else if(data.player_id != Game.player_id){
     updateBoard(data.coord, data.letter);
     turnOnClick();
   }
@@ -29,8 +40,8 @@ socket.onmessage = parseMessage;
 var updateBoard = function(coord, letter){
   clickedBox = $('#'+coord);
   clickedBox.html(letter);
-  clickedBox.removeClass('clickable');
   $('.clickable').unbind('click');
+  clickedBox.removeClass('clickable');
 };
 
 $(document).ready(function(){

@@ -13,10 +13,22 @@ class Game < ActiveRecord::Base
 
   def winner
     player_one_moves = self.player_one.moves(self.id) # Define moves on player
+    player_two_moves = self.player_two.moves(self.id) # Define moves on player
     WINNING_COMBOS.each do |combo|
       return player_one if combo.all? { |coord| player_one_moves.include? coord }
       return player_two if combo.all? { |coord| player_two_moves.include? coord }
     end
+    nil
+  end
+
+  def player(player_id)
+    return "player_one" if player_id == self.player_one.id
+    return "player_two" if player_id == self.player_two.id
+    "code should never reach this point"
+  end
+
+  def draw?
+    self.moves.length == 9
   end
 end
 
